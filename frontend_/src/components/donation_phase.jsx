@@ -81,6 +81,9 @@ const DonationPhase = ({
     }
     hasDrawn.current = true;
 
+    console.log(`🃏 [${player.name}] Deck before draw:`, deck.map(c => `${c.type} ${c.value}`));
+    console.log(`📦 [${player.name}] Deck size before draw:`, deck.length);
+
     const updatedDeck = [...deck];
     const drawn = [];
 

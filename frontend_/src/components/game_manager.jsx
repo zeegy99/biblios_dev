@@ -39,6 +39,28 @@ const GameRunner = ({ playerName }) => {
   const [goldWinner, setGoldWinner] = useState(null);
   const [goldCard, setGoldCard] = useState(null);
   const [auctionTurnOffset, setAuctionTurnOffset] = useState(0);
+  const [finalResults, setFinalResults] = useState([]);
+
+  const handleRestart = () => {
+  // Reset all game state to initial values
+  setPhase("donation");
+  setDeck(buildDeck());
+  setDiscardPile([]);
+  setSharedPool([]);
+  setDice(rollDice());
+  setPlayers(players.map(p => ({
+    ...p,
+    hand: [],
+    gold: 0,
+    points: 0,
+  })));
+  setFinalResults([]);
+  setFinalPhaseDone(false);
+  setLastDonatorIndex(null);
+  setAuctionStarterIndex(null);
+
+  broadcastState(); // Optional: broadcast clean state
+};
 
 
   //Building out what gameState is
@@ -405,26 +427,32 @@ useEffect(() => {
 
       {phase === "scoring" && dice && (
         <ScoringPhase
-          players={players}
-          dice={dice}
-          isHost={players[0]?.name === playerName} // ✅ this line was missing before
-          setFinalResults={(scoredPlayers) => {
-            setPlayers(scoredPlayers);
-            setFinalPhaseDone(true);
-            broadcastState();
-          }}
-
-          goToResults={() => {
-          setPhase("results");
-      broadcastState({ phase: "results" });
-    }}
-        />
+  players={players}
+  dice={dice}
+  isHost={players[0]?.name === playerName}
+  setFinalResults={(scoredPlayers) => {
+    setPlayers(scoredPlayers);
+    setFinalResults(scoredPlayers);
+    setFinalPhaseDone(true);
+    
+    // ✅ broadcast to all players
+    broadcastState({
+      players: scoredPlayers,
+      finalResults: scoredPlayers,
+      finalPhaseDone: true,
+    });
+  }}
+  goToResults={() => {
+    setPhase("results");
+    broadcastState({ phase: "results" });
+  }}
+/>
       )}
 
-      {phase === "results" && finalPhaseDone && (
+      {phase === "results" && (
         <ResultsScreen
-          players={players}
-          onRestart={() => window.location.reload()}
+           players={finalResults}
+            onRestart={handleRestart}
         />
       )}
 
