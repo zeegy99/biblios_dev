@@ -219,7 +219,7 @@ const AuctionPhase = ({
         const winner = updatedPlayers[winnerIdx];
         console.log("🏆 Winner found:", winner.name);
 
-        winner.hand.push(currentCard);
+        // winner.hand.push(currentCard);
 
         if (isGold) 
           {
@@ -348,6 +348,7 @@ const AuctionPhase = ({
   updatedPlayers[goldPaymentWinner.index].gold -= totalSelected;
 
   // Add the won card to hand
+  console.log("Pushing the card")
   updatedPlayers[goldPaymentWinner.index].hand.push(goldPaymentWinner.card);
   const updatedDiscardPile = [...discardPile];
   updatedDiscardPile.splice(currentCardIndex, 1); // or use .shift() if always index 0

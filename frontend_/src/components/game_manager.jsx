@@ -275,8 +275,9 @@ useEffect(() => {
       {phase === "donation" && (
         
         <DonationPhase
-          isCurrentPlayer={currentPlayer.name === playerName}
-          player={currentPlayer}
+          isCurrentPlayer={playerName === players[currentPlayerIndex]?.name}
+          player={players.find(p => p.name === playerName)} // 👈 local player!
+          players={players}
           deck={deck}
           setDeck={setDeck}
           setDiscardPile={setDiscardPile}
@@ -285,7 +286,6 @@ useEffect(() => {
           setSharedPool={setSharedPool}
           setPlayers={setPlayers}
           broadcastState={broadcastState}
-          players={players} 
           currentPlayerIndex={currentPlayerIndex}
           totalPlayers={players.length}
           onFinish={({ updatedDiscard, updatedShared, updatedPlayers }) => {

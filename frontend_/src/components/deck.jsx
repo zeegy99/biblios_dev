@@ -1,7 +1,7 @@
 // src/utils/deck.js
 
 export function buildDeck() {
-  const card_q = { 1: 2, 2: 2, 3: 1, 4: 0 };
+  const card_q = { 1: 1, 2: 0, 3: 0, 4: 0 };
   const resourceTypes = ["Religion", "Science", "Military", "Art", "Herbs"]; //Leaving this out for now 
   const tieBreakers = ["A", "B", "C", "D"];
   const deck = [];
@@ -21,7 +21,7 @@ export function buildDeck() {
   }
 
   // Add Gold cards
-  for (let i = 0; i < 4; i++) {
+  for (let i = 0; i < 1; i++) {
     for (let k = 1; k <= 2; k++) {
       deck.push({
         value: k,
@@ -33,27 +33,27 @@ export function buildDeck() {
      
   }
 
-  // for (let i = 0; i < 1; i++) {
-  //    deck.push({
-  //     value: 2,
-  //     type: "Plus", // or "Minus" or "Both"
-  //     isSpecial: true
-  //   });
-  // }
-  // for (let i = 0; i < 1; i++) {
-  //    deck.push({
-  //     value: 2,
-  //     type: "Minus", // or "Minus" or "Both"
-  //     isSpecial: true
-  //   });
-  // }
-  // for (let i = 0; i < 1; i++) {
-  //    deck.push({
-  //     value: 2,
-  //     type: "Both", // or "Minus" or "Both"
-  //     isSpecial: true
-  //   });
-  // }
+  for (let i = 0; i < 1; i++) {
+     deck.push({
+      value: 2,
+      type: "Plus", // or "Minus" or "Both"
+      isSpecial: true
+    });
+  }
+  for (let i = 0; i < 1; i++) {
+     deck.push({
+      value: 2,
+      type: "Minus", // or "Minus" or "Both"
+      isSpecial: true
+    });
+  }
+  for (let i = 0; i < 1; i++) {
+     deck.push({
+      value: 2,
+      type: "Both", // or "Minus" or "Both"
+      isSpecial: true
+    });
+  }
 
  
 
