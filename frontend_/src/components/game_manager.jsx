@@ -8,6 +8,7 @@ import SharedPoolSelection from "./shared_selection";
 import { buildDeck } from "./deck.jsx";
 import { rollDice } from "../utils/setup";
 import socket from "../socket";
+import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
 const GameRunner = ({ playerName }) => {
@@ -41,26 +42,22 @@ const GameRunner = ({ playerName }) => {
   const [auctionTurnOffset, setAuctionTurnOffset] = useState(0);
   const [finalResults, setFinalResults] = useState([]);
 
+  const navigate = useNavigate();
+
   const handleRestart = () => {
-  // Reset all game state to initial values
-  setPhase("donation");
-  setDeck(buildDeck());
-  setDiscardPile([]);
-  setSharedPool([]);
-  setDice(rollDice());
-  setPlayers(players.map(p => ({
-    ...p,
-    hand: [],
-    gold: 0,
-    points: 0,
-  })));
+  localStorage.removeItem("last_game_state");
+  localStorage.removeItem("start_game_payload");
+
+  // Optional: reset any local state if needed
   setFinalResults([]);
   setFinalPhaseDone(false);
-  setLastDonatorIndex(null);
-  setAuctionStarterIndex(null);
+  setPlayers([]);
+  setDeck([]);
+  setDice(null);
 
-  broadcastState(); // Optional: broadcast clean state
+  navigate("/lobby");
 };
+
 
 
   //Building out what gameState is
@@ -460,17 +457,27 @@ useEffect(() => {
         <button onClick={advancePhase}>Next Phase</button>
       )} */}
 
-      <div>
-        {players.map((p, i) => (
-          <p key={i}>
-            {p.name}: {p.gold} gold, {p.points} points
+      {phase !== "results" && (
+        <>
+        </>
+
+
+      )}
+
+
+
+        {phase !== "results" && phase !== "scoring" && (
+        <div>
+          <p>
+            {playerName}: {players.find(p => p.name === playerName)?.gold ?? 0} gold
           </p>
-        ))}
-      </div>
+        </div>
+      )}
 
       <div style={{ marginTop: "30px" }}>
         <h3>Game State</h3>
 
+        {/* ✅ KEEP: Player sees only their own hand */}
         <h4>{playerName}'s Hand</h4>
         <ul>
           {players.find(p => p.name === playerName)?.hand.map((card, index) => (
@@ -480,15 +487,21 @@ useEffect(() => {
           )) ?? <li>(No cards)</li>}
         </ul>
 
-        <h4>Discard Pile</h4>
-        <ul>
-          {discardPile.map((card, index) => (
-            <li key={index}>
-              {card.type} {card.value}
-            </li>
-          ))}
-        </ul>
+        {/* 🔻 CHANGED: Hide discard pile unless debugging */}
+        {false && (
+          <>
+            <h4>Discard Pile</h4>
+            <ul>
+              {discardPile.map((card, index) => (
+                <li key={index}>
+                  {card.type} {card.value}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
 
+        {/* ✅ KEEP: Everyone sees the shared pool */}
         <h4>Shared Pool</h4>
         <ul>
           {sharedPool.map((card, index) => (
