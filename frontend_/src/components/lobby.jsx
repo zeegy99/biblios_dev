@@ -5,7 +5,7 @@ import socket from "../socket";
 const Lobby = ({ playerName, setPlayerName }) => {
   const [players, setPlayers] = useState([]);
   const navigate = useNavigate();
-  const room = "biblios";
+  const room = localStorage.getItem("roomCode") || "biblios";
 
   useEffect(() => {
   socket.emit("join_game", { room, playerName });
@@ -45,7 +45,7 @@ const Lobby = ({ playerName, setPlayerName }) => {
 
   const handleStartGame = () => {
     console.log("🚀 Start Game button clicked");
-    socket.emit("start_game", { room: "biblios" });
+    socket.emit("start_game", { room: room });
   };
 
   const isHost = players.length > 0 && players[0].name === playerName;
@@ -53,7 +53,7 @@ const Lobby = ({ playerName, setPlayerName }) => {
   return (
     <div style={{ textAlign: "center", marginTop: "50px" }}>
       <h2>Waiting Room</h2>
-      <p>Room: {room}</p>
+      <p>Room: <strong>{room}</strong></p>
       <h3>Players Joined:</h3>
       <ul>
         {players.map((p, i) => (
