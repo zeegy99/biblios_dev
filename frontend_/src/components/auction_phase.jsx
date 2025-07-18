@@ -94,6 +94,7 @@ const AuctionPhase = ({
   const currentCard = discardPile[currentCardIndex];
   const isGold = currentCard?.type === "Gold";
   const player = biddingOrder[activePlayerIndex];
+  const [bidInput, setBidInput] = useState("");
 
 
   const getNextActivePlayerIndex = () => {
@@ -551,14 +552,18 @@ const AuctionPhase = ({
     <input
       type="number"
       min={0}
+      value={bidInput}
       placeholder="Enter bid"
-      onKeyDown={(e) => {
-        if (e.key === "Enter") {
-          handleBid(Number(e.target.value));
-          e.target.value = "";
-        }
-      }}
+      onChange={(e) => setBidInput(e.target.value)}
     />
+    <button
+      onClick={() => {
+        handleBid(Number(bidInput));
+        setBidInput("");
+      }}
+    >
+      Bid
+    </button>
     <button onClick={handlePass}>Pass</button>
   </>
 )}

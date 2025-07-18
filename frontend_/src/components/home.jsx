@@ -25,6 +25,8 @@ const Home = ({ setPlayerName }) => {
     console.log(newRoom)
     localStorage.setItem("playerName", nameInput);
     localStorage.setItem("roomCode", newRoom);
+    const shareableLink = `${window.location.origin}/lobby?room=${newRoom}`;
+    console.log("🔗 Share this room link:", shareableLink);
     setPlayerName(nameInput);
     navigate("/lobby");
   };

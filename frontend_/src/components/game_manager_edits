@@ -1,8 +1,0 @@
-setPlayerHands={(updateFn) =>
-            setPlayers((prev) =>
-              prev.map((p, i) => {
-                const updatedHand = updateFn(prev.map((p) => p.hand))[i];
-                return { ...p, hand: updatedHand };
-              })
-            )
-          }
