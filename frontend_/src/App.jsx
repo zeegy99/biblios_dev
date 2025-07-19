@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./components/home.jsx";
 import Lobby from "./components/lobby.jsx";
 import Play from "./components/play_component.jsx";
-import NamePrompt from "./components/name_prompt.jsx";
 import socket from "./socket";
 
 function App() {
@@ -16,14 +15,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Home setPlayerName={setPlayerName} />} />
-        <Route
-            path="/lobby"
-            element={
-            playerName
-            ? <Lobby playerName={playerName} setPlayerName={setPlayerName} />
-            : <NamePrompt setPlayerName={setPlayerName} />
-            }
-        />
+       <Route path="/lobby" element={<Lobby playerName={playerName} setPlayerName={setPlayerName} setPlayerList={setPlayerList} />} />
         <Route path="/game" element={<Play playerName={playerName} playerList={playerList} />} />
       </Routes>
     </Router>

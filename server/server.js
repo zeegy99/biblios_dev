@@ -27,12 +27,6 @@ io.on("connection", (socket) => {
       console.log(`${playerName} joined room ${room}`);
     }
 
-    const nameTaken = playersInRoom[room].some(p => p.name === playerName);
-    if (nameTaken) {
-      socket.emit("name_conflict", { message: "Name already taken in this room." });
-      return;
-    }
-
     io.to(room).emit("player_list", playersInRoom[room]);
   });
 
