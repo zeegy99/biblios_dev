@@ -302,6 +302,7 @@ useEffect(() => {
           setDiscardPile={setDiscardPile}
           discardPile={discardPile}
           sharedPool={sharedPool}
+          phase={phase}
           setSharedPool={setSharedPool}
           setPlayers={setPlayers}
           broadcastState={broadcastState}

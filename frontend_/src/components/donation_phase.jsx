@@ -16,6 +16,7 @@ const DonationPhase = ({
   onFinish,
   totalPlayers,
   currentPlayerIndex,
+  phase,
 }) => {
   const numToDraw = 2 + (totalPlayers - 1);
   const [cardsToProcess, setCardsToProcess] = useState([]);
@@ -27,6 +28,7 @@ const DonationPhase = ({
   const handledSpecialCards = useRef(new Set());
   const [specialCardToPlay, setSpecialCardToPlay] = useState(null);
   const [drawnCount, setDrawnCount] = useState(0); // counts non-specials
+  const isFirstRender = useRef(true);
 
   //Dice UI
   const [diceToModify, setDiceToModify] = useState(null);
@@ -55,6 +57,7 @@ const DonationPhase = ({
 };
 
   //For SpecialCards
+  
  useEffect(() => {
   if (!specialCardToPlay || !isCurrentPlayer) return;
 
@@ -65,30 +68,48 @@ const DonationPhase = ({
   }, 300);
 }, [specialCardToPlay, isCurrentPlayer]);
 
-  //For carddraw
+
   useEffect(() => {
-  if (!isCurrentPlayer || hasDrawn.current) return;
+  if (phase !== "donation") return;
+
+  // Only reset when donation phase starts for a new player
+  hasDrawn.current = false;
+  console.log("🔄 Resetting draw flag for", player.name);
+}, [phase, player.name]);
+
+
+  //For DrawingCards
+  useEffect(() => {
+  if (phase !== "donation" || !isCurrentPlayer) return;
+
+  if (hasDrawn.current) {
+    console.warn("🛑 Duplicate draw attempt prevented for", player.name);
+    return;
+  }
+
+  console.log("📌 Draw effect triggered for", player.name);
   hasDrawn.current = true;
 
   const updatedDeck = [...deck];
   const drawn = [];
-  
 
   while (drawn.length < numToDraw && updatedDeck.length > 0) {
-  const card = updatedDeck.pop();
+    const card = updatedDeck.pop();
 
-  if (card.isSpecial) {
-    handledSpecialCards.current.add(card);     // ✅ queue it for later
-    continue;                                  // ❌ don't add to drawn
+    if (card.isSpecial) {
+      handledSpecialCards.current.add(card); // ✅ Queue for later
+      continue; // ❌ Don't count toward draw
+    }
+
+    drawn.push(card);
   }
-  drawn.push(card);
-}
+
+  console.log(`🃏 ${player.name} drew cards:`, drawn);
+  console.log(`📦 Deck size after draw: ${updatedDeck.length}`);
 
   setDeck(updatedDeck);
   setDonationDeck(updatedDeck);
   setCardsToProcess(drawn.reverse());
-
- 
   broadcastState({ deck: updatedDeck });
 
   if (drawn.length < numToDraw) {
@@ -97,19 +118,15 @@ const DonationPhase = ({
     return;
   }
 
-   const specialsArray = [...handledSpecialCards.current];
-if (specialsArray.length > 0) {
-  const [first, ...rest] = specialsArray;
-  setSpecialCardToPlay(first);
-  handledSpecialCards.current = new Set(rest);
-}
+  const specialsArray = [...handledSpecialCards.current];
+  if (specialsArray.length > 0) {
+    const [first, ...rest] = specialsArray;
+    setSpecialCardToPlay(first);
+    handledSpecialCards.current = new Set(rest);
+  }
+}, [phase, isCurrentPlayer]);
 
-  // Queue up all special cards for sequential processing
-  // if (specials.length > 0) {
-  //   setSpecialCardToPlay(specials[0]);
-  //   handledSpecialCards.current = new Set(specials.slice(1)); // hold the rest
-  // }
-}, []);
+
 
 
 
@@ -256,7 +273,7 @@ if (specialsArray.length > 0) {
                   if (nextChosen.size === needed) {
 
                     broadcastState({ dice: updated });
-                    setSpecialCardToPlay(null);
+                    // setSpecialCardToPlay(null);
                     setDiceToModify(null);
                     setDiceSelectionCard(null);
                     setDiceChosen(new Set());

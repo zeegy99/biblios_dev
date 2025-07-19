@@ -21,7 +21,7 @@ export function buildDeck() {
   }
 
   // Add Gold cards: 5 of each value (1–3) = 15 total
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 5; i++) {
     for (let k = 1; k <= 3; k++) {
       deck.push({
         value: k,
@@ -33,15 +33,15 @@ export function buildDeck() {
   }
 
   // 2 of each special card type: Plus, Minus, Both
-  for (let j = 1; j < 3; j++) {
-    ["Plus", "Minus", "Both"].forEach(type => {
-      deck.push({
-        value: j,
-        type,
-        isSpecial: true
-      });
-    });
-  }
+  // for (let j = 1; j < 3; j++) {
+  //   ["Plus", "Minus", "Both"].forEach(type => {
+  //     deck.push({
+  //       value: j,
+  //       type,
+  //       isSpecial: true
+  //     });
+  //   });
+  // }
 
   shuffle(deck);
   return deck;
