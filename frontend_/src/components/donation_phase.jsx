@@ -54,61 +54,63 @@ const DonationPhase = ({
   setDiceChosen(new Set());           // For tracking selected dice
 };
 
+  //For SpecialCards
  useEffect(() => {
   if (!specialCardToPlay || !isCurrentPlayer) return;
 
   const card = specialCardToPlay;
-  if (handledSpecialCards.current.has(card)) return;
-
-  handledSpecialCards.current.add(card);
 
   setTimeout(() => {
     playSpecialCard(card);
-
-    // ✅ Remove the resolved special card from the screen
-    setCardsToProcess((prev) =>
-      prev.filter((c) => c !== card)
-    );
-
-    // // ✅ Clear the tracker
-    // setSpecialCardToPlay(null);
   }, 300);
 }, [specialCardToPlay, isCurrentPlayer]);
 
+  //For carddraw
   useEffect(() => {
-    if (!isCurrentPlayer || hasDrawn.current) {
-      return;
-    }
-    hasDrawn.current = true;
+  if (!isCurrentPlayer || hasDrawn.current) return;
+  hasDrawn.current = true;
 
-    console.log(`🃏 [${player.name}] Deck before draw:`, deck.map(c => `${c.type} ${c.value}`));
-    console.log(`📦 [${player.name}] Deck size before draw:`, deck.length);
+  const updatedDeck = [...deck];
+  const drawn = [];
+  
 
-    const updatedDeck = [...deck];
-    const drawn = [];
+  while (drawn.length < numToDraw && updatedDeck.length > 0) {
+  const card = updatedDeck.pop();
 
-    while (drawn.length < numToDraw && updatedDeck.length > 0) {
-      const card = updatedDeck.pop();
-      if (card.isSpecial) {
-          // drawn.push(card); // show it like a normal card first
-          setSpecialCardToPlay(card); // trigger effect later
-          continue;
-        } else {
-          drawn.push(card);
-      }
-    }
+  if (card.isSpecial) {
+    handledSpecialCards.current.add(card);     // ✅ queue it for later
+    continue;                                  // ❌ don't add to drawn
+  }
+  drawn.push(card);
+}
 
-    if (drawn.length < numToDraw) {
-      console.warn("Not enough non-special cards — skipping to auction");
-      broadcastState({ phase: "auction" });
-      return;
-    }
+  setDeck(updatedDeck);
+  setDonationDeck(updatedDeck);
+  setCardsToProcess(drawn.reverse());
 
-    setDeck(updatedDeck);
-    setDonationDeck(updatedDeck);
-    setCardsToProcess(drawn.reverse()); // optional: maintain draw order
-    broadcastState({ deck: updatedDeck });
-  }, []);
+ 
+  broadcastState({ deck: updatedDeck });
+
+  if (drawn.length < numToDraw) {
+    console.warn("Not enough non-special cards — skipping to auction");
+    broadcastState({ phase: "auction" });
+    return;
+  }
+
+   const specialsArray = [...handledSpecialCards.current];
+if (specialsArray.length > 0) {
+  const [first, ...rest] = specialsArray;
+  setSpecialCardToPlay(first);
+  handledSpecialCards.current = new Set(rest);
+}
+
+  // Queue up all special cards for sequential processing
+  // if (specials.length > 0) {
+  //   setSpecialCardToPlay(specials[0]);
+  //   handledSpecialCards.current = new Set(specials.slice(1)); // hold the rest
+  // }
+}, []);
+
 
 
   const handleChoice = (card, action) => {
@@ -252,12 +254,26 @@ const DonationPhase = ({
 
                   const needed = diceSelectionCard.value === 2 ? 2 : 1;
                   if (nextChosen.size === needed) {
+
                     broadcastState({ dice: updated });
                     setSpecialCardToPlay(null);
                     setDiceToModify(null);
                     setDiceSelectionCard(null);
                     setDiceChosen(new Set());
                     setCardsToProcess((prev) => prev.filter((c) => c !== diceSelectionCard));
+
+                     // Remove current special from cardsToProcess
+                    setCardsToProcess((prev) => prev.filter((c) => c !== diceSelectionCard));
+
+                    // Queue next special
+                    const remaining = [...handledSpecialCards.current];
+                    if (remaining.length > 0) {
+                      const [next, ...rest] = remaining;
+                      setSpecialCardToPlay(next);
+                      handledSpecialCards.current = new Set(rest);
+                    } else {
+                      setSpecialCardToPlay(null);
+                    }
                   }
                 }}
               >
